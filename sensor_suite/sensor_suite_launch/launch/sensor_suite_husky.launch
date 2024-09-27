@@ -1,0 +1,9 @@
+<launch>
+  <!-- launch sensor_suite -->
+  <include file="$(find sensor_suite_launch)/launch/sensor_suite_all.launch">
+    <arg name="is_independent" value="false"/>
+  </include>
+
+  <!-- launch husky -->
+  <include file="$(find husky_base)/launch/base.launch"/>
+</launch>

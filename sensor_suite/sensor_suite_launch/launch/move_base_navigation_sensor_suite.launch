@@ -1,0 +1,69 @@
+<launch>
+<group ns="sensor_suite">
+    <!-- Ouster LiDAR -->
+    <include file="$(find ouster_ros)/launch/driver.launch">
+      <arg name="sensor_hostname" value="192.168.10.210" />
+      <arg name="viz" value="false"/>
+    </include>
+
+    <!-- Use the thermal camera in the final demo -->
+      <!-- <include file="$(find camera_aravis)/launch/camera_aravis.launch">
+        <arg name="sensor_name" value="lwir"/>
+        <arg name="serial_no" value="Xenics-Ceres-1280-GigE-20746"/>
+        <arg name="fps" value="20"/>
+        <arg name="pixel_format" value="Mono8"/>
+        <arg name="width" value="1280"/>
+        <arg name="height" value="1024"/>
+        Parameters to configure triggering are located in camera_aravis.launch
+    </include> -->
+
+    <!-- Just tests, with the right flir camera -->
+    <include file="$(find spinnaker_camera_driver)/launch/camera.launch">
+      <arg name="camera_name" value="right_camera_optical"/>
+      <arg name="camera_serial" value="24122731"/>
+      <arg name="frame_rate" value="60"/> <!--redundant with external trigger-->
+    </include>
+</group>
+
+<arg name="is_independent" default="true"/>
+<group if="$(arg is_independent)">
+  <!-- Load the URDF file -->
+  <param name="robot_description" command="$(find xacro)/xacro $(find sensor_suite_description)/urdf/sensor_suite_all_calibrated.urdf.xacro is_independent:=$(arg is_independent)"/>
+
+  <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+
+  <!-- Start RViz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find sensor_suite_description)/rviz/navigation_move_base.rviz" required="true" />
+</group>
+
+  <!-- Move base works without the urdfs and the robot and joint state publisher -->
+  <!-- Load the URDF file -->
+  <!-- <param name="robot_description" command="cat $(find sensor_suite_description)/urdf/sensor_suite3.urdf.xacro"/>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" /> -->
+  <!-- Start RViz -->
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find sensor_suite_description)/rviz/sara.rviz" required="true" /> -->
+
+  <!-- You will need the husky drivers for the move base to launch -->
+  <arg name="port" default="$(optenv HUSKY_PORT /dev/prolific_11)" />
+    <node pkg="husky_base" type="husky_node" name="husky_node">
+        <rosparam subst_value="true">
+            port: $(arg port) 
+
+            control_frequency: 10.0
+            diagnostic_frequency: 1.0
+
+            max_acceleration: 3.0
+            max_speed: 1.0
+            wheel_diameter: 0.3302
+            polling_timeout: 10.0
+        </rosparam>
+    </node>
+    <include file="$(find husky_control)/launch/control.launch" />
+    <include file="$(find husky_control)/launch/teleop.launch" />
+    <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator">
+        <rosparam command="load" file="$(find husky_base)/config/diagnostics.yaml"/>
+    </node>
+</launch>

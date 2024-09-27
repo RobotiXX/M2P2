@@ -1,0 +1,92 @@
+<launch>
+<group ns="sensor_suite">
+    <!-- Ouster LiDAR -->
+    <include file="$(find ouster_ros)/launch/driver.launch">
+      <arg name="sensor_hostname" value="192.168.10.210" />
+      <arg name="timestamp_mode" value="TIME_FROM_ROS_TIME"/>
+      <arg name="viz" value="false"/>
+    </include>
+
+    <!-- WIT IMU -->
+    <!-- <include file="$(find wit_ros_imu)/launch/imu.launch"/> -->
+    <!--coordinate frame for IMU is set in imu.launch-->
+
+    <!-- witmotion_ros IMU -->
+    <include file="$(find witmotion_ros)/launch/witmotion.launch"/>
+    <!--coordinate frame for IMU is set in driver's config yaml-->
+    
+    <!-- Ublox GPS -->
+    <include file="$(find ublox_gps)/launch/rover.launch" />
+
+    <!-- FLIR Left Camera -->
+    <include file="$(find spinnaker_camera_driver)/launch/camera.launch">
+      <arg name="camera_name" value="left_camera_optical"/>
+      <arg name="camera_serial" value="24122728"/>
+      <arg name="frame_rate" value="60"/> <!--redundant with external trigger-->
+    </include>
+
+    <!-- FLIR Right Camera -->
+    <include file="$(find spinnaker_camera_driver)/launch/camera.launch">
+      <arg name="camera_name" value="right_camera_optical"/>
+      <arg name="camera_serial" value="24122731"/>
+      <arg name="frame_rate" value="60"/> <!--redundant with external trigger-->
+    </include>
+
+
+     <!-- Xenics LWIR -->
+    <include file="$(find camera_aravis)/launch/camera_aravis.launch">
+      <arg name="sensor_name" value="lwir"/>
+      <arg name="serial_no" value="Xenics-Ceres-1280-GigE-20746"/>
+      <arg name="fps" value="20"/>
+      <arg name="pixel_format" value="Mono8"/>
+      <arg name="width" value="1280"/>
+      <arg name="height" value="1024"/>
+      <!--Parameters to configure triggering are located in camera_aravis.launch-->
+    </include>
+
+    <!-- Event Camera (unofficial but better driver)-->
+    <node pkg="nodelet" type="nodelet" name="driver_nodelet" args="standalone metavision_driver/DriverNodelet" clear_params="true" output="screen">
+      <param name="use_multithreading" value="true"/>
+      <param name="event_message_time_threshold" value="0.004"/>
+
+      <param name="trigger_message_time_threshold" value="0"/>
+      <param name="statistics_print_interval" value="1.0"/>
+      <param name="bias_file" value=""/>
+      <remap from="~/events" to="event_camera/events"/>
+      <rosparam command="load" file="$(find metavision_driver)/config/trigger_pins.yaml"/>
+      <!--record external trigger events along with CD events-->
+      
+      <param name="trigger_in_mode" value="external"/>
+      <param name="erc_mode" value="enabled"/>
+      <param name="erc_rate" value="100000000"/>
+    </node>
+
+
+    <!--Event to Image-->
+    <include file="$(find event_camera_renderer)/launch/renderer.launch"/>
+
+
+    <!-- Load FLIR camera params -->
+    <node name="dynamic_reconfigure_load_flir_left" pkg="dynamic_reconfigure" type="dynparam" args="load /sensor_suite/left_camera_optical/spinnaker_camera_nodelet/ $(find spinnaker_camera_driver)/params/left_triggered.yaml" />
+    <node name="dynamic_reconfigure_load_flir_right" pkg="dynamic_reconfigure" type="dynparam" args="load /sensor_suite/right_camera_optical/spinnaker_camera_nodelet/ $(find spinnaker_camera_driver)/params/right_triggered.yaml" />
+
+    <!--OS1 Lidar configurator-->
+    <!--LIDAR will reset when running this to apply configuration-->
+    <!--Standalone configurator is required as official driver service does not guarantee saving of config-->
+    <node name="ouster_lidar_config" pkg="sensor_suite_launch" type="lidar_configurator.py" output="screen"/>
+    <!--configuration values hardcoded in lidar_configurator-->
+  </group>
+
+  <!--is_independent should be set to false for use with an existing platform like Husky-->
+<arg name="is_independent" default="true"/>
+<group if="$(arg is_independent)">
+  <!-- Load the URDF file -->
+  <param name="robot_description" command="$(find xacro)/xacro $(find sensor_suite_description)/urdf/sensor_suite_all_calibrated.urdf.xacro is_independent:=$(arg is_independent)"/>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+
+  <!-- Start RViz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find sensor_suite_description)/rviz/sara.rviz" required="true" />
+</group>
+</launch>

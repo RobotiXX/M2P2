@@ -1,0 +1,18 @@
+<package>
+  <name>sensor_suite_launch</name>
+  <version>1.0.0</version>
+  <description>Catkin metapackage for sensor suite</description>
+  <maintainer email="mbalajir@gmu.edu">Robotixx</maintainer>
+  <license>placeholder</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>wit_ros_imu</run_depend>
+  <run_depend>spinnaker_camera_driver</run_depend>
+  <run_depend>ouster_ros</run_depend>
+  <run_depend>camera_info_manager</run_depend>
+  <run_depend>ublox_gps</run_depend>
+  <run_depend>camera_aravis</run_depend>
+  <run_depend>metavision_driver</run_depend>
+
+</package>
