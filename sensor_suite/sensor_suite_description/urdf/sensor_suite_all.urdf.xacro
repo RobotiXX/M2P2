@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="sensor_suite">
+    <xacro:arg name="is_independent" default="false"/>
+    
+    <xacro:property name="base_link_name" value="sensor_base_link"/>
+
+    <!-- Base link -->
+    <link name="${base_link_name}">
+        <visual>
+            <geometry>
+                <mesh filename="package://sensor_suite_description/meshes/sensor_suite.obj" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </visual>
+    </link>
+
+    <xacro:if value="$(arg is_independent)">
+        <!-- Create an independent base_link when is_independent is true -->
+        <link name="base_link"/>
+        <joint name="base_link_to_sensor_base" type="fixed">
+            <parent link="base_link"/>
+            <child link="${base_link_name}"/>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </joint>
+    </xacro:if>
+
+    <xacro:unless value="$(arg is_independent)">
+        <!--required for husky, connects sensor_base_link to Husky's base_link-->
+        <joint name="sensor_base_to_baselink" type="fixed">
+            <parent link="base_link"/>
+            <child link="${base_link_name}"/>
+            <origin xyz="0.24 0.0 0.318" rpy="0 0 0"/>    
+        </joint>
+    </xacro:unless>
+
+
+    <!-- Center camera (event_camera) -->
+    <link name="event_camera"/>
+    <joint name="base_to_event_camera" type="fixed">
+        <parent link="${base_link_name}"/>
+        <child link="event_camera"/>
+        <origin xyz="0.1385 0 0.008" rpy="0 0 0"/>
+    </joint>
+
+    <link name="event_camera_lens"/>
+    <joint name="event_camera_lens_joint" type="fixed">
+        <origin xyz="0.02 0 0.01425" rpy="0 0 0" />
+        <parent link="event_camera" />
+        <child link="event_camera_lens" />
+    </joint>
+    <link name="event_camera_optical" />
+    <joint name="event_camera_optical_joint" type="fixed">
+        <origin xyz="-0.004 0.0068 0.0049" rpy="-1.570796 0 -1.570796" />
+        <parent link="event_camera_lens" />
+        <child link="event_camera_optical" />
+    </joint>
+
+    <!-- Left camera -->
+    <link name="left_camera"/>
+    <joint name="base_to_left_camera" type="fixed">
+        <parent link="${base_link_name}"/>
+        <child link="left_camera"/>
+        <origin xyz="0.1466 0.1 0.0085" rpy="0 0 0"/>
+    </joint>
+    <link name="left_camera_lens"/>
+    <joint name="left_camera_lens_joint" type="fixed">
+        <origin xyz="0.02685 0 0.01425" rpy="0 0 0" />
+        <parent link="left_camera" />
+        <child link="left_camera_lens" />
+    </joint>
+    <link name="left_camera_optical" />
+    <joint name="left_camera_optical_joint" type="fixed">
+        <origin xyz="-0.01 0.0068 0.0049" rpy="-1.570796 0 -1.570796" />
+        <parent link="left_camera_lens" />
+        <child link="left_camera_optical" />
+    </joint>
+
+    <!-- Right camera -->
+    <link name="right_camera"/>
+    <joint name="base_to_right_camera" type="fixed">
+        <parent link="${base_link_name}"/>
+        <child link="right_camera"/>
+        <origin xyz="0.1466 -0.1 0.0085" rpy="0 0 0"/>
+    </joint>
+    <link name="right_camera_lens"/>
+    <joint name="right_camera_lens_joint" type="fixed">
+        <origin xyz="0.02685 0 0.01425" rpy="0 0 0" />
+        <parent link="right_camera" />
+        <child link="right_camera_lens" />
+    </joint>
+    <link name="right_camera_optical" />
+    <joint name="right_camera_optical_joint" type="fixed">
+        <origin xyz="-0.01 0.0068 0.0049" rpy="-1.570796 0 -1.570796" />
+        <parent link="right_camera_lens" />
+        <child link="right_camera_optical" />
+    </joint>
+
+    <!-- IR camera -->
+    <link name="ir_camera"/>
+    <joint name="base_to_ir_camera" type="fixed">
+        <parent link="${base_link_name}"/>
+        <child link="ir_camera"/>
+        <origin xyz="0.1121 0 0.053" rpy="0 0 0"/>
+    </joint>
+    <link name="ir_camera_lens"/>
+    <joint name="ir_camera_lens_joint" type="fixed">
+        <origin xyz="0.04285 0 0.0325" rpy="0 0 0" />
+        <parent link="ir_camera" />
+        <child link="ir_camera_lens" />
+    </joint>
+    <link name="ir_camera_optical" />
+    <joint name="ir_camera_optical_joint" type="fixed">
+        <origin xyz="-0.01 0.0068 0.0049" rpy="-1.570796 0 -1.570796" />
+        <parent link="ir_camera_lens" />
+        <child link="ir_camera_optical" />
+    </joint>
+
+    <!-- IMU -->
+    <link name="yahboom_imu"/>
+    <joint name="base_to_imu" type="fixed">
+        <parent link="${base_link_name}"/>
+        <child link="yahboom_imu"/>
+        <origin xyz="0 0 0.07" rpy="0 0 0"/>
+    </joint>
+
+    <!-- LiDAR sensor -->
+    <link name="os_sensor"/>
+    <joint name="base_to_lidar" type="fixed">
+        <parent link="${base_link_name}"/>
+        <child link="os_sensor"/>
+        <origin xyz="0 0 0.1575" rpy="0 0 0"/>
+    </joint>
+
+    <!-- OS1-64 LiDAR -->
+    <link name="os_lidar"/>
+    <link name="os_imu" /> 
+    <joint name="os_sensor_to_os_lidar" type="fixed"> 
+        <parent link="os_sensor" /> 
+        <child link="os_lidar" /> 
+        <origin xyz="0 0 0.042" rpy="0 0 0" /> 
+    </joint> 
+    <joint name="os_lidar_to_imu_joint" type="fixed"> 
+        <parent link="os_lidar" /> 
+        <child link="os_imu" /> 
+        <origin xyz="0.006253 -0.011775 0.007645" rpy="0 0 0" /> 
+    </joint> 
+</robot>

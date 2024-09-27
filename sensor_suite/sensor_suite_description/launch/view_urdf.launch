@@ -1,0 +1,9 @@
+<launch>
+  <!-- Load the URDF file -->
+  <param name="robot_description" command="cat $(find sensor_suite_description)/urdf/sensor_suite_all_calibrated.urdf.xacro"/>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+  <!-- Start RViz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find sensor_suite_description)/rviz/urdf_config.rviz" required="true" />
+</launch>
