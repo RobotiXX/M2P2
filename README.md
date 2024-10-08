@@ -1,23 +1,23 @@
 # M2P2: Multi-Modal Passive Perception Dataset
 
-![Preview](https://cs.gmu.edu/~xiao/Research/M2P2/m2p2.png)
+![Preview](https://raw.githubusercontent.com/RobotiXX/M2P2/main/images/m2p2.png)
 
  M2P2 Dataset and Open-Source Build are available on
 
-[![Dataset Access](https://cs.gmu.edu/~xiao/Research/M2P2/dataverse.png '')](https://dataverse.orc.gmu.edu/dataset.xhtml?persistentId=doi:10.13021/orc2020/SP577T)
+[![Dataset Access](https://raw.githubusercontent.com/RobotiXX/M2P2/main/images/dataverse.png '')](https://dataverse.orc.gmu.edu/dataset.xhtml?persistentId=doi:10.13021/orc2020/SP577T)
 
 M2P2 is a Multi-Modal Passive Perception dataset designed for off-road mobility in extreme low-light conditions. This repository contains the code and resources related to the M2P2 dataset, which enables off-road mobility using passive perception in low-light to no-light conditions.
 
 ## Dataset Overview
 
-- **Total Size**: ≈2 TB
+- **Total Size**: 1138.63 GB
 - **Total Distance**: >32 km
-- **Total Time**: 10.15 hours
+- **Total Time**: ~10.15 hours
 - **Environments**: Paved trails, non-paved off-road paths, and unprepared off-trail areas
 - **Lighting Conditions**: 20 lx to complete darkness (0 lx)
 
 ## Sensor Suite
-![Sensor suite](https://cs.gmu.edu/~xiao/Research/M2P2/suite.jpg)
+![Sensor suite](https://raw.githubusercontent.com/RobotiXX/M2P2/main/images/suite.jpg)
 
 The M2P2 dataset was collected using a multi-modal sensor suite mounted on a Clearpath Husky A200 robot, including:
 
@@ -38,6 +38,19 @@ The dataset consists of the following runs, with each of the runs consisting of 
 5. GMU West Campus - day 1 (90s chunks)
 6. GMU West Campus - day 2 (60s chunks)
 7. GMU West Campus - day 3 (90s chunks)
+
+### Dataverse directory information
+
+| Dataverse Directory | Number of Files | Total Size (GB) | Chunk Size (seconds) |
+|-----------|-----------------|-----------------|----------------------|
+| m2p2_rosbags/burke_lake | 136 | 297.49 | 60 |
+| m2p2_rosbags/lake_braddock | 59 | 134.08 | 90 |
+| m2p2_rosbags/lake_royal | 103 | 223.91 | 90 |
+| m2p2_rosbags/main_campus | 56 | 139.87 | 45 |
+| m2p2_rosbags/west_campus_1 | 28 | 66.78 | 90 |
+| m2p2_rosbags/west_campus_2 | 72 | 137.77 | 60 |
+| m2p2_rosbags/west_campus_3 | 60 | 138.73 | 90 |
+
 
 ## Rosbag information
 
