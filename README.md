@@ -10,7 +10,7 @@ M2P2 is a Multi-Modal Passive Perception dataset designed for off-road mobility 
 
 ## Dataset Overview
 
-- **Total Size**: 1138.63 GB
+- **Total Compressed Size**: 1138.63 GB
 - **Total Distance**: >32 km
 - **Total Time**: ~10.15 hours
 - **Environments**: Paved trails, non-paved off-road paths, and unprepared off-trail areas
